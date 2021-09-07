@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.plot.ly/plotly-2.4.2.min.js"></script>
+    <script src='cd.js'>  </script>
+    
+</head>
+<body>
+    <h1>Gradient Descent</h1>
+    <p>Gradient descent is an optimization algorithm used to minimize some function 
+    by iteratively moving in the direction of steepest descent as defined by the negative of the gradient. 
+    In machine learning, we use gradient descent to update the parameters of our model.</p>
+    <p> Generally we want to minimize the cost function:</p>
+    <img src="" id="Cost" \>
+    <div id="tester" style="width:1200px;height:500px;"></div>
+    <p>m and b value of y=m*x+b</p>
+    <p>m value:</p>
+    <p id="m"></p>
+    <p>b value:</p>
+    <p id="b"></p>
+    <div id="linear" style="width:1200px;height:500px;"></div>
+    <div id ="CostFunc" style="width: 1200px;height:500px;"></div>
+    <script>
+    //Se carga la imagén    
+    getImage();
+    //Gráfica y muestra los resultados
+    //se llama a gradient() dentro de la función  
+    graph();
+    </script>
+    
+</body>
+</html>
