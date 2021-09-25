@@ -1,10 +1,13 @@
-//Iteraciones para hacer la regresión lineal
+//Iteraciones máximas para hacer la regresión lineal
 const iterations = 5000;
+//Threshold value
+const tv = 0.515;
 //Arrays donde se almacenan los datos
 let xvalues = [];
 let yvalues = [];
-let J = Array(iterations);
-let xiterations = Array(iterations);
+let xiterations = [];
+let matrixdata = [];
+let Jvalues = [];
 
 //Valores inciales de m y b y=mx+b
 let m =0;
@@ -15,9 +18,15 @@ let b =0;
 //Muestra los resultados finales
 async function graph() {
     const TESTER = document.getElementById('tester');
-    //await getData();
-    await getxData();
-    await getyData();
+    let useCSVAsData = window.prompt("Do you wish to use a predetermined CSV as your dataset? Write Yes or No");
+    if(useCSVAsData=='Yes'){
+        await getData();
+    }
+    if(useCSVAsData=='No'){
+        await getxData();
+        await getyData();
+    }
+    
     let data1 = [{
         x: xvalues,
         y: yvalues,
@@ -36,17 +45,21 @@ async function graph() {
 
 	Plotly.newPlot( TESTER,data1,layout );
     
-    let matrixdata = new Array(xvalues.length).fill(0).map(() => new Array(iterations).fill(0));
-    
-    matrixdata = gradient(xvalues,yvalues,iterations);
-   
-
+    gradient(xvalues,yvalues,iterations);
     document.getElementById("m").innerHTML = m ;
     document.getElementById("b").innerHTML = b;
     const results2 = linear(m,b,xvalues);
     const LINEAR = document.getElementById('linear');
-    const results3 = getCol(matrixdata,10);
-    const results4 = getCol(matrixdata,800);
+
+    let results34 = [];
+    for(i = 0;i <2; i++)
+    {
+    let randomnumber=Math.floor(Math.random()*matrixdata.length)+1;
+    results34.push(randomnumber);
+    }
+    console.log(results34)
+    const results3 = getrow(results34[0]); //checar como automatizarlo 
+    const results4 = getrow(results34[1]);
 
     let datatrue = {
         x: xvalues,
@@ -66,25 +79,25 @@ async function graph() {
         x: xvalues,
         y: results3,
         mode: 'lines',
-        name: '10 iterations',
+        name: `${results34[0]} iterations`,
     };
 
     let data4 = {
         x: xvalues,
         y: results4,
         mode: 'lines',
-        name: '800 iterations',
+        name: `${results34[1]} iterations`,
     };
 
     let arrayData = [datatrue,data2,data3,data4];
 
 
     Plotly.newPlot(LINEAR,arrayData,layout);
-    console.log(J);
 
+    
     let Jdata = [{
         x: xiterations,
-        y: J,
+        y: Jvalues,
         mode: 'markers',
     }];
 
@@ -147,31 +160,31 @@ async function getyData(){
 //Modifica los valores de m y b , y de vuelve un arreglo de los valores que fue tomando y    
 function gradient(datax,datay){
         const N = datax.length;
-        let matrix = new Array(N).fill(0).map(() => new Array(iterations).fill(0));
         let ynew = Array(N);
         let Error = Array(N);
+        let J =0;
         
         let Lr = 0.001;  //Learning Rate
 
         for (let k = 0; k < iterations; k++) {
-        
+            matrixdata[k]=[];
             let deltam = 0;
             for (let i=0; i < N;i++){
                 ynew[i]= (m*datax[i]) + b;
                 Error[i] = ynew[i]-datay[i];
                 deltam = deltam + (Error[i]*datax[i]);
-                matrix[i][k]=ynew[i];
+                matrixdata[k][i]=ynew[i];
             }
-
             m = m - ((1/N)* deltam)*Lr;
             b = b - arrayAverage(Error)*Lr;
-            J[k] =arrayAverage(multArray(Error));
-            xiterations[k]= k;
-            
-
+            J=arrayAverage(multArray(Error));
+            xiterations.push(k);
+            Jvalues.push(J);
+            if(J<tv){
+                break;
+            }
             
         } 
-        return matrix;
 }
     
 //Saca el promedio de numeros de un arreglo
@@ -194,12 +207,10 @@ function linear(m,b,xvalues){
 }
 
 //Obtiene columnas de una matriz
-function getCol(matrix,col){
-    let column = [];
-    for(let i=0; i<matrix.length;i++){
-        column.push(matrix[i][col]);
-    }
-    return column;
+function getrow(row){
+    let fila = [];
+    fila = matrixdata[row];
+    return fila;
 }
 //Multiplicación de arrays
 function multArray(arr){
